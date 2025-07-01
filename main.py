@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from utils import ReplayBuffer, train
 import time
 import argparse
-
+import numpy as np
 
 #argument parsing
 
@@ -42,7 +42,7 @@ batch_size = 32
 num_episodes = 10_000
 max_steps = 500
 
-test = 8
+test = 9
 
 # Main:
 # -----
@@ -75,7 +75,7 @@ if train_dqn:
 
     for n_epi in range(num_episodes):
         #! Epsilon decay (Please come up with your own logic)
-        epsilon = max(0.1, 1.0 - n_epi * 0.001
+        epsilon = max(0.1, 1.0 - (n_epi*0.4) * 0.001
                       )  # ! Linear annealing from 8% to 1%
 
         s, _ = env.reset()
@@ -132,6 +132,13 @@ if train_dqn:
 
     #! Save the trained Q-net
     torch.save(q_net.state_dict(), f"dqn_{test}.pth")
+
+    rewards_np = np.array(rewards)
+    epsilon_decay_np = np.array(epsilon_decay)
+
+    #! Save the rewards and epsilon decay
+    np.save(f"rewards{test}.npy", rewards_np)
+    np.save(f"epsilon_decay{test}.npy", epsilon_decay_np)
 
     #! Plot the training curve
     plt.plot(rewards, label='Reward per Episode')
